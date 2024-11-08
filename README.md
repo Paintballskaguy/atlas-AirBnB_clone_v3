@@ -154,10 +154,10 @@ EOF  all  create  destroy  help  quit  show  update
 No known bugs at this time. 
 
 ## Authors
-Alexa Orrico - [Github](https://github.com/alexaorrico) / [Twitter](https://twitter.com/alexa_orrico)  
-Jennifer Huang - [Github](https://github.com/jhuang10123) / [Twitter](https://twitter.com/earthtojhuang)
-John Wilson - [Github](https://github.com/Paintballskaguy) / [Email](john.wilson@atlasschool.com)
-Donovan Heape - [Github](https://github.com/SudoSavvy) / [Email](donovan.heape@atlasschool.com)
+- Alexa Orrico - [Github](https://github.com/alexaorrico) / [Twitter](https://twitter.com/alexa_orrico)  
+- Jennifer Huang - [Github](https://github.com/jhuang10123) / [Twitter](https://twitter.com/earthtojhuang)
+- John Wilson - [Github](https://github.com/Paintballskaguy) / [Email](john.wilson@atlasschool.com)
+- Donovan Heape - [Github](https://github.com/SudoSavvy) / [Email](donovan.heape@atlasschool.com)
 
 Second part of Airbnb: Joann Vuong
 ## License
