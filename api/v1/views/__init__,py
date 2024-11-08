@@ -1,6 +1,11 @@
+"""
+Initializes the blueprint for the API views.
+"""
+
 from flask import Blueprint
 
+# Blueprint instance for views with the url prefix '/api/v1'
 app_views = Blueprint('app_views', __name__, url_prefix='/api/v1')
 
-# Import routes
+# Import index after defining app_views to avoid circular imports
 from api.v1.views.index import *
