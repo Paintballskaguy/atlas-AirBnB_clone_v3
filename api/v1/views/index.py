@@ -14,7 +14,7 @@ from models.review import Review
 from models.state import State
 from models.user import User
 
-@app.route('/api/v1/stats', methods=['GET'])
+@app_views.route('/api/v1/stats', methods=['GET'])
 def stats():
     stats_data = {
         "users": 3,
@@ -25,3 +25,4 @@ def stats():
         "states": 3
     }
     return jsonify(stats_data)
+
