@@ -17,7 +17,7 @@ from models.user import User
 @app.route('/api/v1/stats', methods=['GET'])
 def stats():
     stats_data = {
-        "users": 3,  # Example data, replace with actual counts
+        "users": 3,
         "places": 5,
         "cities": 2,
         "amenities": 3,
