@@ -11,7 +11,6 @@ def get_states():
 
 @app_views.route('/states', methods=['GET'], strict_slashes=False)
 def get_states():
-    from api.v1.views import app_views
     state = storage.get(State, state_id)
     if not state:
         abort(404)
