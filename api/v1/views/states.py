@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 from flask import jsonify, request, abort
-from api.v1.views import app_views
 from models import storage
 from models.state import State
 
@@ -12,6 +11,7 @@ def get_states():
 
 @app_views.route('/states/<state_id>', methods=['GET'], strict_slashes=False)
 def get_state(state_id):
+    from api.v1.views import app_views
     """Retrieves a State object by ID"""
     state = storage.get(State, state_id)
     if state is None:
