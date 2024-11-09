@@ -1,8 +1,13 @@
 #!/usr/bin/python3
+"""
+Module for handling State related routes in the API.
+This module includes routes for retrieving, creating, updating, and deleting State objects.
+"""
+
 from flask import jsonify, request, abort
 from models import storage
 from models.state import State
-from api.v1.views import app_views  # Import app_views from __init__.py
+from api.v1.views import app_views
 
 @app_views.route('/states', methods=['GET'], strict_slashes=False)
 def get_states():
