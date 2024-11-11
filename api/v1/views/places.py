@@ -83,8 +83,6 @@ def update_place(place_id):
     data = request.get_json()
     if not data:
         abort(400, description="Not a JSON")
-    if 'place_id' not in data:
-        abort(400, description="Missing place_id")
         
 
     for key, value in data.items():
