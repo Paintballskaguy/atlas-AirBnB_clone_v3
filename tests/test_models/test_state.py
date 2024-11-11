@@ -75,11 +75,34 @@ class TestState(unittest.TestCase):
         self.ctx = app.app_context()
         self.ctx.push()
         storage.reload()
+        
+        for state in storage.all(State).values():
+            storage.delete(state)
+        storage.save()
 
     def tearDown(self):
         """Remove the test context after each test"""
         storage.close()
         self.ctx.pop()
+
+    def test_create_state_unsupported_media_type(self):
+            """Test POST /api/v1/states with unsupported media type (no Content-Type)"""
+            response = self.client.post('/api/v1/states', data="Invalid JSON format")
+            self.assertEqual(response.status_code, 415, "Expected status code 415 for unsupported media type")
+
+    def test_create_state_invalid_json(self):
+        """Test POST /api/v1/states with invalid JSON data"""
+        # Set Content-Type header but provide invalid JSON format
+        headers = {"Content-Type": "application/json"}
+        response = self.client.post('/api/v1/states', data="Invalid JSON format", headers=headers)
+        self.assertEqual(response.status_code, 400, "Expected status code 400 for invalid JSON")
+
+    def test_create_state_missing_name(self):
+        """Test POST /api/v1/states with missing 'name' field in JSON"""
+        headers = {"Content-Type": "application/json"}
+        response = self.client.post('/api/v1/states', json={}, headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Missing name", response.get_json().get("description"))
 
     def test_is_subclass(self):
         """Test that State is a subclass of BaseModel"""

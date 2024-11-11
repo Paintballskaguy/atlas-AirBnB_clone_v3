@@ -5,6 +5,7 @@ Main app module to start Flask for the API
 """
 
 
+from http.client import HTTPException
 from flask import Flask, jsonify, Blueprint
 from api.v1.views.index import app_views
 from models import storage
@@ -23,6 +24,12 @@ def teardown_db(exception=None):
 @app.errorhandler(404)
 def not_found(error=None):
     return jsonify({"error": "Not found"}), 404
+
+@app.errorhandler(400)
+def bad_request(error):
+    """Handles 400 Bad Request errors by returning a JSON response"""
+    message = error.description if isinstance(error, HTTPException) else str(error)
+    return jsonify({"error": message}), 400
 
 
 if __name__ == "__main__":
