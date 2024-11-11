@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Contains the TestStateDocs, TestState classes, and API tests for /states endpoint.
+Contains the TestStateDocs, TestState classes, and API tests.
 """
 
 import unittest
@@ -15,9 +15,10 @@ from models import state
 from models.state import State
 from models.base_model import BaseModel
 
+
 class TestStateDocs(unittest.TestCase):
     """Tests to check the documentation and style of State class"""
-    
+
     @classmethod
     def setUpClass(cls):
         """Set up for the doc tests"""
@@ -78,7 +79,7 @@ class TestState(unittest.TestCase):
         self.assertTrue(hasattr(state, "updated_at"))
 
     def test_name_attr(self):
-        """Test that State has attribute name, and it's an empty string or None based on storage"""
+        """Test that State has attribute name, empty string or None"""
         state = State()
         self.assertTrue(hasattr(state, "name"))
         if models.storage_t == 'db':
@@ -116,18 +117,19 @@ class TestState(unittest.TestCase):
 
     def test_get_states_returns_list(self):
         """Test that GET /api/v1/states returns a JSON list"""
-        
+
         response = self.client.get("/api/v1/states")
         self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(response.json, list, "Expected JSON response to be a list")
-        self.assertEqual(len(response.json), 0)  # Adjust this based on expected data in your test DB
+        self.assertIsInstance(response.json, list, (
+            "Expected JSON response to be a list"))
+        self.assertEqual(len(response.json), 0)
 
     def test_get_state_by_id(self):
         """Test GET /api/v1/states/<state_id> for a valid State"""
         state = State(name="TestState")
-        storage.new(state)
+        storage.new(state)()
         storage.save()
-        
+
         response = self.client.get(f"/api/v1/states/{state.id}")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["name"], "TestState")
@@ -135,6 +137,7 @@ class TestState(unittest.TestCase):
         # Clean up
         storage.delete(state)
         storage.save()
+
 
 if __name__ == '__main__':
     unittest.main()
