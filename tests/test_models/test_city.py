@@ -5,12 +5,14 @@ Contains the TestCityDocs classes
 
 from datetime import datetime
 import inspect
+from api.v1.app import app
+from models.state import State
 import models
-from models import city
+from models.city import City
 from models.base_model import BaseModel
 import pycodestyle as pep8
+from models import storage
 import unittest
-City = city.City
 
 
 class TestCityDocs(unittest.TestCase):
@@ -112,3 +114,132 @@ class TestCity(unittest.TestCase):
         city = City()
         string = "[City] ({}) {}".format(city.id, city.__dict__)
         self.assertEqual(string, str(city))
+
+
+class TestCityAPI(unittest.TestCase):
+    """Test API endpoints related to City"""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up Flask test client and other test resources"""
+        app.testing = True
+        cls.client = app.test_client()
+
+    def setUp(self):
+        """Set up test context and initialize data for each test"""
+        self.ctx = app.app_context()
+        self.ctx.push()
+        storage.reload()
+
+        # Create a state to use in tests
+        self.state = State(name="TestState")
+        storage.new(self.state)
+        storage.save()
+
+    def tearDown(self):
+        """Tear down test context and remove created data"""
+        storage.delete(self.state)
+        storage.save()
+        self.ctx.pop()
+
+    def test_get_cities_by_state(self):
+        """Test GET /api/v1/states/<state_id>/cities"""
+        response = self.client.get(f"/api/v1/states/{self.state.id}/cities")
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.json, list)
+        self.assertEqual(len(response.json), 0)
+
+    def test_get_city(self):
+        """Test GET /api/v1/cities/<city_id>"""
+        city = City(name="TestCity", state_id=self.state.id)
+        storage.new(city)
+        storage.save()
+
+        response = self.client.get(f"/api/v1/cities/{city.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["name"], "TestCity")
+
+        # Clean up
+        storage.delete(city)
+        storage.save()
+
+    def test_delete_city(self):
+        """Test DELETE /api/v1/cities/<city_id>"""
+        city = City(name="TestCityToDelete", state_id=self.state.id)
+        storage.new(city)
+        storage.save()
+
+        response = self.client.delete(f"/api/v1/cities/{city.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {})
+
+        # Ensure city was deleted
+        response = self.client.get(f"/api/v1/cities/{city.id}")
+        self.assertEqual(response.status_code, 404)
+
+    def test_create_city(self):
+        """Test POST /api/v1/states/<state_id>/cities"""
+        headers = {"Content-Type": "application/json"}
+        data = {"name": "NewCity"}
+
+        response = self.client.post(
+            f"/api/v1/states/{self.state.id}/cities",
+            json=data,
+            headers=headers
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json["name"], "NewCity")
+        self.assertEqual(response.json["state_id"], self.state.id)
+
+    def test_create_city_missing_name(self):
+        """Test POST /api/v1/states/<state_id>/cities with missing 'name'"""
+        headers = {"Content-Type": "application/json"}
+        response = self.client.post('/api/v1/states', json={}, headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Missing name", response.get_json().get("error"))
+
+    def test_update_city(self):
+        """Test PUT /api/v1/cities/<city_id>"""
+        city = City(name="OldCity", state_id=self.state.id)
+        storage.new(city)
+        storage.save()
+
+        headers = {"Content-Type": "application/json"}
+        data = {"name": "UpdatedCity"}
+
+        response = self.client.put(
+            f"/api/v1/cities/{city.id}",
+            json=data,
+            headers=headers
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["name"], "UpdatedCity")
+
+        # Clean up
+        storage.delete(city)
+        storage.save()
+
+    def test_update_city_invalid_json(self):
+        """Test PUT /api/v1/cities/<city_id> with invalid JSON"""
+        city = City(name="CityWithBadData", state_id=self.state.id)
+        storage.new(city)
+        storage.save()
+
+        headers = {"Content-Type": "application/json"}
+        data = "Invalid JSON"
+
+        response = self.client.put(
+            f"/api/v1/cities/{city.id}",
+            data=data,
+            headers=headers
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Not a JSON", response.get_json().get("error"))
+
+        # Clean up
+        storage.delete(city)
+        storage.save()
+
+
+if __name__ == '__main__':
+    unittest.main()
