@@ -9,19 +9,17 @@ from flask import Flask, jsonify, Blueprint
 from api.v1.views.index import app_views
 from models import storage
 
-app_views = Blueprint('app_views', __name__, url_prefix='/api/v1')
-
 # Initialize Flask
 app = Flask(__name__)
 app.register_blueprint(app_views)
 
 @app.teardown_appcontext
-def teardown_db(exception):
+def teardown_db(exception=None):
     """Closes storage on teardown"""
     storage.close()
 
 @app.errorhandler(404)
-def not_found(error):
+def not_found(error=None):
     return jsonify({"error": "Not found"}), 404
 
 if __name__ == "__main__":

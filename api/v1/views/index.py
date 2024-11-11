@@ -3,7 +3,7 @@
 """
 Defines routes for index
 """
-
+from flask import Flask
 from flask import Blueprint, jsonify
 from api.v1.views import app_views
 from models import storage
