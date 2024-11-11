@@ -17,10 +17,12 @@ from models.user import User
 
 app_views = Blueprint('app_views', __name__, url_prefix='/api/v1')
 
+
 @app_views.route('/status', methods=['GET'])
 def status():
     """checks the api status"""
     return jsonify({"status": "OK"})
+
 
 @app_views.route('/stats', methods=['GET'])
 def stats():
