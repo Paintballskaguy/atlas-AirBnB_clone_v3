@@ -27,5 +27,5 @@ def stats():
         "reviews": 2,
         "states": 3
     }
-    return jsonify(stats_data)
+    return jsonify({"status": "OK"})
 
