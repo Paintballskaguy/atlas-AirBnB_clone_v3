@@ -1,20 +1,23 @@
 #!/usr/bin/python3
 """
-Contains the TestStateDocs classes
+Contains the TestStateDocs, TestState classes, and API tests for /states endpoint.
 """
 
-from datetime import datetime
-import inspect
-import models
-from models import state
-from models.base_model import BaseModel
-import pycodestyle as pep8
 import unittest
-State = state.State
-
+import inspect
+from datetime import datetime
+import json
+import pycodestyle as pep8
+from api.v1.app import app  # Import the Flask app for testing
+import models
+from models import storage
+from models import state
+from models.state import State
+from models.base_model import BaseModel
 
 class TestStateDocs(unittest.TestCase):
     """Tests to check the documentation and style of State class"""
+    
     @classmethod
     def setUpClass(cls):
         """Set up for the doc tests"""
@@ -58,7 +61,14 @@ class TestStateDocs(unittest.TestCase):
 
 
 class TestState(unittest.TestCase):
-    """Test the State class"""
+    """Test the State class and API endpoints related to State"""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up Flask test client and other test resources"""
+        cls.client = app.test_client()
+        cls.client.testing = True
+
     def test_is_subclass(self):
         """Test that State is a subclass of BaseModel"""
         state = State()
@@ -68,7 +78,7 @@ class TestState(unittest.TestCase):
         self.assertTrue(hasattr(state, "updated_at"))
 
     def test_name_attr(self):
-        """Test that State has attribute name, and it's as an empty string"""
+        """Test that State has attribute name, and it's an empty string or None based on storage"""
         state = State()
         self.assertTrue(hasattr(state, "name"))
         if models.storage_t == 'db':
@@ -77,18 +87,18 @@ class TestState(unittest.TestCase):
             self.assertEqual(state.name, "")
 
     def test_to_dict_creates_dict(self):
-        """test to_dict method creates a dictionary with proper attrs"""
+        """Test to_dict method creates a dictionary with proper attributes"""
         s = State()
         new_d = s.to_dict()
         self.assertEqual(type(new_d), dict)
         self.assertFalse("_sa_instance_state" in new_d)
         for attr in s.__dict__:
-            if attr is not "_sa_instance_state":
+            if attr != "_sa_instance_state":
                 self.assertTrue(attr in new_d)
         self.assertTrue("__class__" in new_d)
 
     def test_to_dict_values(self):
-        """test that values in dict returned from to_dict are correct"""
+        """Test that values in dict returned from to_dict are correct"""
         t_format = "%Y-%m-%dT%H:%M:%S.%f"
         s = State()
         new_d = s.to_dict()
@@ -99,7 +109,32 @@ class TestState(unittest.TestCase):
         self.assertEqual(new_d["updated_at"], s.updated_at.strftime(t_format))
 
     def test_str(self):
-        """test that the str method has the correct output"""
+        """Test that the str method has the correct output"""
         state = State()
         string = "[State] ({}) {}".format(state.id, state.__dict__)
         self.assertEqual(string, str(state))
+
+    def test_get_states_returns_list(self):
+        """Test that GET /api/v1/states returns a JSON list"""
+        
+        response = self.client.get("/api/v1/states")
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.json, list, "Expected JSON response to be a list")
+        self.assertEqual(len(response.json), 0)  # Adjust this based on expected data in your test DB
+
+    def test_get_state_by_id(self):
+        """Test GET /api/v1/states/<state_id> for a valid State"""
+        state = State(name="TestState")
+        storage.new(state)
+        storage.save()
+        
+        response = self.client.get(f"/api/v1/states/{state.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["name"], "TestState")
+
+        # Clean up
+        storage.delete(state)
+        storage.save()
+
+if __name__ == '__main__':
+    unittest.main()
