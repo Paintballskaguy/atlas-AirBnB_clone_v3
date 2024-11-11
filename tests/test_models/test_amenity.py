@@ -159,7 +159,8 @@ class TestAmenityAPI(unittest.TestCase):
         self.assertEqual(response.json, {})
 
     def test_delete_amenity_not_found(self):
-        """Test DELETE /api/v1/amenities/<amenity_id> with a non-existent ID."""
+        """Test DELETE /api/v1/amenities/<amenity_id>
+        with a non-existent ID."""
         response = self.client.delete('/api/v1/amenities/invalid_id')
         self.assertEqual(response.status_code, 404)
 
