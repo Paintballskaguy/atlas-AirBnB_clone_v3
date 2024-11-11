@@ -6,6 +6,7 @@ from flask import Blueprint
 
 # Define the Blueprint for views
 app_views = Blueprint("app_views", __name__, url_prefix="/api/v1")
+app_views.url_map.strict_slashes = False
 
 # Import views after defining app_views to avoid circular imports
 from api.v1.views.index import *
