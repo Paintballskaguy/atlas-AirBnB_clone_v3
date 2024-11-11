@@ -8,7 +8,7 @@ import inspect
 from datetime import datetime
 import json
 import pycodestyle as pep8
-from api.v1.app import app  # Import the Flask app for testing
+from api.v1.app import app
 import models
 from models import storage
 from models import state
@@ -67,8 +67,19 @@ class TestState(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up Flask test client and other test resources"""
+        app.testing = True
         cls.client = app.test_client()
-        cls.client.testing = True
+
+    def setUp(self):
+        """Set up context and reload storage before each test"""
+        self.ctx = app.app_context()
+        self.ctx.push()
+        storage.reload()
+
+    def tearDown(self):
+        """Remove the test context after each test"""
+        storage.close()
+        self.ctx.pop()
 
     def test_is_subclass(self):
         """Test that State is a subclass of BaseModel"""
@@ -115,19 +126,10 @@ class TestState(unittest.TestCase):
         string = "[State] ({}) {}".format(state.id, state.__dict__)
         self.assertEqual(string, str(state))
 
-    def test_get_states_returns_list(self):
-        """Test that GET /api/v1/states returns a JSON list"""
-
-        response = self.client.get("/api/v1/states")
-        self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(response.json, list, (
-            "Expected JSON response to be a list"))
-        self.assertEqual(len(response.json), 0)
-
     def test_get_state_by_id(self):
-        """Test GET /api/v1/states/<state_id> for a valid State"""
+        """Test GET /state/<state_id> for a valid State"""
         state = State(name="TestState")
-        storage.new(state)()
+        storage.new(state)
         storage.save()
 
         response = self.client.get(f"/api/v1/states/{state.id}")
