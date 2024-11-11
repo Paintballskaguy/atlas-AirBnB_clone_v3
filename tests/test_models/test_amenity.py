@@ -70,7 +70,7 @@ class TestAmenity(unittest.TestCase):
         self.assertTrue(hasattr(amenity, "updated_at"))
 
     def test_name_attr(self):
-        """Test that Amenity has attribute name, and it's as an empty string"""
+        """Test that Amenity has attribute name, and it's an empty string"""
         amenity = Amenity()
         self.assertTrue(hasattr(amenity, "name"))
         if models.storage_t == 'db':
@@ -86,7 +86,7 @@ class TestAmenity(unittest.TestCase):
         self.assertEqual(type(new_d), dict)
         self.assertFalse("_sa_instance_state" in new_d)
         for attr in am.__dict__:
-            if attr is not "_sa_instance_state":
+            if attr != "_sa_instance_state":
                 self.assertTrue(attr in new_d)
         self.assertTrue("__class__" in new_d)
 
@@ -167,7 +167,9 @@ class TestAmenityAPI(unittest.TestCase):
         """Test POST /api/v1/amenities to create a new amenity."""
         headers = {"Content-Type": "application/json"}
         data = {"name": "New Amenity"}
-        response = self.client.post('/api/v1/amenities', json=data, headers=headers)
+        response = self.client.post(
+            '/api/v1/amenities', json=data, headers=headers
+        )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json['name'], "New Amenity")
 
@@ -179,14 +181,18 @@ class TestAmenityAPI(unittest.TestCase):
     def test_create_amenity_missing_name(self):
         """Test POST /api/v1/amenities with missing 'name' field."""
         headers = {"Content-Type": "application/json"}
-        response = self.client.post('/api/v1/amenities', json={}, headers=headers)
+        response = self.client.post(
+            '/api/v1/amenities', json={}, headers=headers
+        )
         self.assertEqual(response.status_code, 400)
         self.assertIn("Missing name", response.get_json().get("error"))
 
     def test_create_amenity_invalid_json(self):
         """Test POST /api/v1/amenities with invalid JSON."""
         headers = {"Content-Type": "application/json"}
-        response = self.client.post('/api/v1/amenities', data="invalid_json", headers=headers)
+        response = self.client.post(
+            '/api/v1/amenities', data="invalid_json", headers=headers
+        )
         self.assertEqual(response.status_code, 400)
         self.assertIn("Not a JSON", response.get_json().get("error"))
 
@@ -194,7 +200,9 @@ class TestAmenityAPI(unittest.TestCase):
         """Test PUT /api/v1/amenities/<amenity_id> to update an amenity."""
         headers = {"Content-Type": "application/json"}
         data = {"name": "Updated Amenity"}
-        response = self.client.put(f'/api/v1/amenities/{self.amenity.id}', json=data, headers=headers)
+        response = self.client.put(
+            f'/api/v1/amenities/{self.amenity.id}', json=data, headers=headers
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json['name'], "Updated Amenity")
 
@@ -202,15 +210,21 @@ class TestAmenityAPI(unittest.TestCase):
         """Test PUT /api/v1/amenities/<amenity_id> with a non-existent ID."""
         headers = {"Content-Type": "application/json"}
         data = {"name": "Updated Amenity"}
-        response = self.client.put('/api/v1/amenities/invalid_id', json=data, headers=headers)
+        response = self.client.put(
+            '/api/v1/amenities/invalid_id', json=data, headers=headers
+        )
         self.assertEqual(response.status_code, 404)
 
     def test_update_amenity_invalid_json(self):
         """Test PUT /api/v1/amenities/<amenity_id> with invalid JSON."""
         headers = {"Content-Type": "application/json"}
-        response = self.client.put(f'/api/v1/amenities/{self.amenity.id}', data="invalid_json", headers=headers)
+        response = self.client.put(
+            f'/api/v1/amenities/{self.amenity.id}',
+            data="invalid_json", headers=headers
+        )
         self.assertEqual(response.status_code, 400)
         self.assertIn("Not a JSON", response.get_json().get("error"))
+
 
 if __name__ == '__main__':
     unittest.main()
