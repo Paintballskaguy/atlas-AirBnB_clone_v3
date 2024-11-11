@@ -26,7 +26,7 @@ def not_found(error=None):
     return jsonify({"error": "Not found"}), 404
 
 @app.errorhandler(400)
-def bad_request(error):
+def bad_request(error=None):
     """Handles 400 Bad Request errors by returning a JSON response"""
     message = error.description if isinstance(error, HTTPException) else str(error)
     return jsonify({"error": message}), 400
