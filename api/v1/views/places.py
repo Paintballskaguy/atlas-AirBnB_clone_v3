@@ -47,7 +47,9 @@ def create_place(city_id):
     """Creates a new Place under a specific City."""
     city = storage.get(City, city_id)
     if not city:
-        abort(404)
+        abort(404)    
+    if not request.is_json:
+        abort(400, description="Not a JSON")
 
     data = request.get_json()
     if not data:
