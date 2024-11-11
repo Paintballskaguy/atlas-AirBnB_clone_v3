@@ -6,7 +6,6 @@ It includes routes to retrieve, create, delete, and update places.
 
 from flask import jsonify, abort, request
 from api.v1.views import app_views
-from api.v1.app import app
 from models import storage
 from models.city import City
 from models.place import Place
