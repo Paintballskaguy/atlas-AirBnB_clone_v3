@@ -14,15 +14,15 @@ the following functionalities:
 Each route interacts with the database using the `storage` object to fetch, create, or modify city data.
 """
 
-from flask import Flask, jsonify, request
+
+from api.v1.views import app_views
+from flask import jsonify, request, abort
 from models import storage
 from models.city import City
 from models.state import State
-from flask import abort
 
-app = Flask(__name__)
 
-@app.route('/api/v1/states/<state_id>/cities', methods=['GET'])
+@app_views.route('/api/v1/states/<state_id>/cities', methods=['GET'], strict_slashes=False)
 def get_cities_by_state(state_id):
     state = storage.get(State, state_id)
     if not state:
@@ -30,14 +30,14 @@ def get_cities_by_state(state_id):
     cities = [city.to_dict() for city in state.cities]
     return jsonify(cities)
 
-@app.route('/api/v1/cities/<city_id>', methods=['GET'])
+@app_views.route('/api/v1/cities/<city_id>', methods=['GET'], strict_slashes=False)
 def get_city(city_id):
     city = storage.get(City, city_id)
     if not city:
         abort(404)
     return jsonify(city.to_dict())
 
-@app.route('/api/v1/cities/<city_id>', methods=['DELETE'])
+@app_views.route('/api/v1/cities/<city_id>', methods=['DELETE'], strict_slashes=False)
 def delete_city(city_id):
     city = storage.get(City, city_id)
     if not city:
@@ -46,7 +46,7 @@ def delete_city(city_id):
     storage.save()
     return jsonify({}), 200
 
-@app.route('/api/v1/states/<state_id>/cities', methods=['POST'])
+@app_views.route('/api/v1/states/<state_id>/cities', methods=['POST'], strict_slashes=False)
 def create_city(state_id):
     state = storage.get(State, state_id)
     if not state:
@@ -64,7 +64,7 @@ def create_city(state_id):
     storage.save()
     return jsonify(city.to_dict()), 201
 
-@app.route('/api/v1/cities/<city_id>', methods=['PUT'])
+@app_views.route('/api/v1/cities/<city_id>', methods=['PUT'], strict_slashes=False)
 def update_city(city_id):
     city = storage.get(City, city_id)
     if not city:
