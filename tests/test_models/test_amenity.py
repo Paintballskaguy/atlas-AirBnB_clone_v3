@@ -26,15 +26,15 @@ class TestAmenityDocs(unittest.TestCase):
 
     def test_pep8_conformance_amenity(self):
         """Test that models/amenity.py conforms to PEP8."""
-        pep8s = pep8.StyleGuide(quiet=True)
-        result = pep8s.check_files(['models/amenity.py'])
+        pep8style = pep8.StyleGuide(quiet=True)
+        result = pep8style.check_files(['models/amenity.py'])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
 
     def test_pep8_conformance_test_amenity(self):
         """Test that tests/test_models/test_amenity.py conforms to PEP8."""
-        pep8s = pep8.StyleGuide(quiet=True)
-        result = pep8s.check_files(['tests/test_models/test_amenity.py'])
+        pep8style = pep8.StyleGuide(quiet=True)
+        result = pep8style.check_files(['tests/test_models/test_amenity.py'])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
 
@@ -161,7 +161,7 @@ class TestAmenityAPI(unittest.TestCase):
         self.assertEqual(response.json, {})
 
     def test_delete_amenity_not_found(self):
-        """Test DELETE /api/v1/amenities/<amenity_id> w/a non-existent ID."""
+        """Test DELETE /api/v1/amenities/<amenity_id> with a non-existent ID."""
         response = self.client.delete('/api/v1/amenities/invalid_id')
         self.assertEqual(response.status_code, 404)
 
@@ -191,12 +191,10 @@ class TestAmenityAPI(unittest.TestCase):
         self.assertIn("Missing name", error_message.get("error", ""))
 
     def test_create_amenity_invalid_json(self):
-        """Test PUT /api/v1/amenities/<amenity_id> with invalid JSON."""
+        """Test POST /api/v1/amenities with invalid JSON."""
         headers = {"Content-Type": "application/json"}
-        amenity_id = "valid_amenity_id"
-        response = self.client.put(
-            f'/api/v1/amenities/{amenity_id}', data="invalid_json",
-            headers=headers
+        response = self.client.post(
+            '/api/v1/amenities', data="invalid_json", headers=headers
         )
         self.assertEqual(response.status_code, 400)
         error_message = response.get_json(silent=True) or {}
@@ -222,10 +220,10 @@ class TestAmenityAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_update_amenity_invalid_json(self):
-        """Test POST /api/v1/amenities with invalid JSON."""
+        """Test PUT /api/v1/amenities/<amenity_id> with invalid JSON."""
         headers = {"Content-Type": "application/json"}
-        response = self.client.post(
-            '/api/v1/amenities', data="invalid_json", headers=headers
+        response = self.client.put(
+            f'/api/v1/amenities/{self.amenity.id}', data="invalid_json", headers=headers
         )
         self.assertEqual(response.status_code, 400)
         error_message = response.get_json(silent=True) or {}
