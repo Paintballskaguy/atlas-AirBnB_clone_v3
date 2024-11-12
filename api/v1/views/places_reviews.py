@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-
 """
 This module provides RESTful API actions for Review objects.
 It includes routes to retrieve, create, delete, and update reviews for places.
@@ -64,14 +63,14 @@ def create_review(place_id):
     if not user:
         abort(404)
 
-    new_review = (
-        Review(text=data['text'], place_id=place_id, user_id=data['user_id'])
-        )
+    new_review = Review(
+        text=data['text'], place_id=place_id, user_id=data['user_id']
+    )
     for key, value in data.items():
-        if key not in (
-            ['id', 'user_id', 'place_id', 'created_at', 'updated_at']:
-            )
-        setattr(new_review, key, value)
+        if key not in [
+            'id', 'user_id', 'place_id', 'created_at', 'updated_at'
+        ]:
+            setattr(new_review, key, value)
 
     storage.new(new_review)
     storage.save()
@@ -90,10 +89,10 @@ def update_review(review_id):
 
     data = request.get_json(silent=True)
     for key, value in data.items():
-        if key not in (
-            ['id', 'user_id', 'place_id', 'created_at', 'updated_at']:
-            )
-        setattr(review, key, value)
+        if key not in [
+            'id', 'user_id', 'place_id', 'created_at', 'updated_at'
+        ]:
+            setattr(review, key, value)
 
     storage.save()
     return jsonify(review.to_dict()), 200
