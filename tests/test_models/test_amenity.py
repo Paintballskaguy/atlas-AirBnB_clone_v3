@@ -223,7 +223,7 @@ class TestAmenityAPI(unittest.TestCase):
         """Test PUT /api/v1/amenities/<amenity_id> with invalid JSON."""
         headers = {"Content-Type": "application/json"}
         response = self.client.put(
-           f'/api/v1/amenities/{self.amenity.id}', data="invalid_json", headers=headers
+           f'/amenities/{self.amenity.id}', data="invalid_json", headers=headers
         )
         self.assertEqual(response.status_code, 400)
         error_message = response.get_json(silent=True) or {}
