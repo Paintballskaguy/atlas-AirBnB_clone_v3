@@ -51,7 +51,7 @@ def create_place(city_id):
     if not request.is_json:
         abort(400, description="Not a JSON")
 
-    data = request.get_json()
+    data = request.get_json(silent=True)
     if data is None:
         abort(400, description="Not a JSON")
     if 'user_id' not in data:
@@ -82,7 +82,7 @@ def update_place(place_id):
     if not place:
         abort(404)
 
-    data = request.get_json()
+    data = request.get_json(silent=True)
     if not data:
         abort(400, description="Not a JSON")
 
