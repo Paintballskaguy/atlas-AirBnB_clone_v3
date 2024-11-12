@@ -5,7 +5,6 @@ Main app module to start Flask for the API
 """
 
 
-from http.client import HTTPException
 from flask import Flask, jsonify
 from flask_cors import CORS
 from api.v1.views.index import app_views
