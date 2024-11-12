@@ -5,15 +5,11 @@ Contains the TestStateDocs, TestState classes, and API tests.
 
 import unittest
 import inspect
-from datetime import datetime
-import json
 import pycodestyle as pep8
 from api.v1.app import app
-import models
 from models import storage
 from models import state
 from models.state import State
-from models.base_model import BaseModel
 
 
 class TestStateDocs(unittest.TestCase):
@@ -26,15 +22,15 @@ class TestStateDocs(unittest.TestCase):
 
     def test_pep8_conformance_state(self):
         """Test that models/state.py conforms to PEP8."""
-        pep8s = pep8.StyleGuide(quiet=True)
-        result = pep8s.check_files(['models/state.py'])
+        pep8style = pep8.StyleGuide(quiet=True)
+        result = pep8style.check_files(['models/state.py'])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
 
     def test_pep8_conformance_test_state(self):
         """Test that tests/test_models/test_state.py conforms to PEP8."""
-        pep8s = pep8.StyleGuide(quiet=True)
-        result = pep8s.check_files(['tests/test_models/test_state.py'])
+        pep8style = pep8.StyleGuide(quiet=True)
+        result = pep8style.check_files(['tests/test_models/test_state.py'])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
 
@@ -94,8 +90,8 @@ class TestStateAPI(unittest.TestCase):
         storage.save()
 
         headers = {"Content-Type": "application/json"}
-        response = self.client.put(f'/api/v1/states/{state.id}',
-                                   data="invalid_json", headers=headers)
+        response = self.client.put(
+            f'/api/v1/states/{state.id}', data="invalid_json", headers=headers)
         self.assertEqual(response.status_code, 400)
         error_message = response.get_json(silent=True) or {}
         self.assertIn("Not a JSON", error_message.get("description", ""))
@@ -111,8 +107,8 @@ class TestStateAPI(unittest.TestCase):
         storage.save()
 
         headers = {"Content-Type": "application/json"}
-        response = self.client.put(f'/api/v1/states/{state.id}',
-                                   json={}, headers=headers)
+        response = self.client.put(
+            f'/api/v1/states/{state.id}', json={}, headers=headers)
         self.assertEqual(response.status_code, 400)
         error_message = response.get_json(silent=True) or {}
         self.assertIn("Missing name", error_message.get("description", ""))
