@@ -81,7 +81,8 @@ class TestStateAPI(unittest.TestCase):
     def test_create_state_invalid_json(self):
         """Test POST /api/v1/states with invalid JSON"""
         headers = {"Content-Type": "application/json"}
-        response = self.client.post('/api/v1/states', data="invalid_json", headers=headers)
+        response = self.client.post(
+            '/api/v1/states', data="invalid_json", headers=headers)
         self.assertEqual(response.status_code, 400)
         error_message = response.get_json() or {}
         self.assertIn("Not a JSON", error_message.get("description", ""))
