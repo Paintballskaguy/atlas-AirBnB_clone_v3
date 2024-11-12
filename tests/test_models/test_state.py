@@ -75,7 +75,7 @@ class TestStateAPI(unittest.TestCase):
         headers = {"Content-Type": "application/json"}
         response = self.client.post('/api/v1/states', json={}, headers=headers)
         self.assertEqual(response.status_code, 400)
-        error_message = response.get_json() or {}
+        error_message = response.get_json(silent=True) or {}
         self.assertIn("Missing name", error_message.get("description", ""))
 
     def test_create_state_invalid_json(self):
@@ -84,7 +84,7 @@ class TestStateAPI(unittest.TestCase):
         response = self.client.post(
             '/api/v1/states', data="invalid_json", headers=headers)
         self.assertEqual(response.status_code, 400)
-        error_message = response.get_json() or {}
+        error_message = response.get_json(silent=True) or {}
         self.assertIn("Not a JSON", error_message.get("description", ""))
 
     def test_update_state_invalid_json(self):
@@ -97,7 +97,7 @@ class TestStateAPI(unittest.TestCase):
         response = self.client.put(f'/api/v1/states/{state.id}',
                                    data="invalid_json", headers=headers)
         self.assertEqual(response.status_code, 400)
-        error_message = response.get_json() or {}
+        error_message = response.get_json(silent=True) or {}
         self.assertIn("Not a JSON", error_message.get("description", ""))
 
         # Clean up
@@ -114,7 +114,7 @@ class TestStateAPI(unittest.TestCase):
         response = self.client.put(f'/api/v1/states/{state.id}',
                                    json={}, headers=headers)
         self.assertEqual(response.status_code, 400)
-        error_message = response.get_json() or {}
+        error_message = response.get_json(silent=True) or {}
         self.assertIn("Missing name", error_message.get("description", ""))
 
         # Clean up

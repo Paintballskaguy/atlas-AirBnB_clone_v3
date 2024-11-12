@@ -187,7 +187,7 @@ class TestAmenityAPI(unittest.TestCase):
             '/api/v1/amenities', json={}, headers=headers
         )
         self.assertEqual(response.status_code, 400)
-        error_message = response.get_json() or {}
+        error_message = response.get_json(silent=True) or {}
         self.assertIn("Missing name", error_message.get("error", ""))
 
     def test_create_amenity_invalid_json(self):
@@ -199,7 +199,7 @@ class TestAmenityAPI(unittest.TestCase):
             headers=headers
         )
         self.assertEqual(response.status_code, 400)
-        error_message = response.get_json() or {}
+        error_message = response.get_json(silent=True) or {}
         self.assertIn("Not a JSON", error_message.get("error", ""))
 
     def test_update_amenity(self):
@@ -228,7 +228,7 @@ class TestAmenityAPI(unittest.TestCase):
             '/api/v1/amenities', data="invalid_json", headers=headers
         )
         self.assertEqual(response.status_code, 400)
-        error_message = response.get_json() or {}
+        error_message = response.get_json(silent=True) or {}
         self.assertIn("Not a JSON", error_message.get("error", ""))
 
 
