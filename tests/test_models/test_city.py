@@ -9,6 +9,7 @@ from api.v1.app import app
 from models.state import State
 import models
 from models.city import City
+from models import city
 from models.base_model import BaseModel
 import pycodestyle as pep8
 from models import storage
