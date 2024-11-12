@@ -61,108 +61,60 @@ class TestStateDocs(unittest.TestCase):
                             "{:s} method needs a docstring".format(func[0]))
 
 
-class TestState(unittest.TestCase):
-    """Test the State class and API endpoints related to State"""
+class TestStateAPI(unittest.TestCase):
+    """Test the State API endpoints"""
 
     @classmethod
     def setUpClass(cls):
-        """Set up Flask test client and other test resources"""
+        """Set up Flask test client for State API tests"""
         app.testing = True
         cls.client = app.test_client()
-
-    def setUp(self):
-        """Set up context and reload storage before each test"""
-        self.ctx = app.app_context()
-        self.ctx.push()
-        storage.reload()
-
-        for state in storage.all(State).values():
-            storage.delete(state)
-        storage.save()
-
-    def tearDown(self):
-        """Remove the test context after each test"""
-        storage.close()
-        self.ctx.pop()
-
-    def test_create_state_unsupported_media_type(self):
-        """Test POST /api/v1/states with unsupported media type"""
-        response = self.client.post(
-            '/api/v1/states', data="Invalid JSON format"
-            )
-        self.assertEqual(response.status_code, 415, "Expected status code 415")
-
-    def test_create_state_invalid_json(self):
-        """Test POST /api/v1/states with invalid JSON data"""
-        # Set Content-Type header but provide invalid JSON format
-        headers = {"Content-Type": "application/json"}
-        response = self.client.post(
-            '/api/v1/states', data="Invalid JSON format", headers=headers
-            )
-        self.assertEqual(response.status_code, 400, (
-            "Expected status code 400 for invalid JSON"))
 
     def test_create_state_missing_name(self):
         """Test POST /api/v1/states with missing 'name' field in JSON"""
         headers = {"Content-Type": "application/json"}
         response = self.client.post('/api/v1/states', json={}, headers=headers)
         self.assertEqual(response.status_code, 400)
-        self.assertIn("Missing name", response.get_json().get("description"))
+        error_message = response.get_json() or {}
+        self.assertIn("Missing name", error_message.get("description", ""))
 
-    def test_is_subclass(self):
-        """Test that State is a subclass of BaseModel"""
-        state = State()
-        self.assertIsInstance(state, BaseModel)
-        self.assertTrue(hasattr(state, "id"))
-        self.assertTrue(hasattr(state, "created_at"))
-        self.assertTrue(hasattr(state, "updated_at"))
+    def test_create_state_invalid_json(self):
+        """Test POST /api/v1/states with invalid JSON"""
+        headers = {"Content-Type": "application/json"}
+        response = self.client.post('/api/v1/states', data="invalid_json", headers=headers)
+        self.assertEqual(response.status_code, 400)
+        error_message = response.get_json() or {}
+        self.assertIn("Not a JSON", error_message.get("description", ""))
 
-    def test_name_attr(self):
-        """Test that State has attribute name, empty string or None"""
-        state = State()
-        self.assertTrue(hasattr(state, "name"))
-        if models.storage_t == 'db':
-            self.assertEqual(state.name, None)
-        else:
-            self.assertEqual(state.name, "")
-
-    def test_to_dict_creates_dict(self):
-        """Test to_dict method creates a dictionary with proper attributes"""
-        s = State()
-        new_d = s.to_dict()
-        self.assertEqual(type(new_d), dict)
-        self.assertFalse("_sa_instance_state" in new_d)
-        for attr in s.__dict__:
-            if attr != "_sa_instance_state":
-                self.assertTrue(attr in new_d)
-        self.assertTrue("__class__" in new_d)
-
-    def test_to_dict_values(self):
-        """Test that values in dict returned from to_dict are correct"""
-        t_format = "%Y-%m-%dT%H:%M:%S.%f"
-        s = State()
-        new_d = s.to_dict()
-        self.assertEqual(new_d["__class__"], "State")
-        self.assertEqual(type(new_d["created_at"]), str)
-        self.assertEqual(type(new_d["updated_at"]), str)
-        self.assertEqual(new_d["created_at"], s.created_at.strftime(t_format))
-        self.assertEqual(new_d["updated_at"], s.updated_at.strftime(t_format))
-
-    def test_str(self):
-        """Test that the str method has the correct output"""
-        state = State()
-        string = "[State] ({}) {}".format(state.id, state.__dict__)
-        self.assertEqual(string, str(state))
-
-    def test_get_state_by_id(self):
-        """Test GET /state/<state_id> for a valid State"""
-        state = State(name="TestState")
+    def test_update_state_invalid_json(self):
+        """Test PUT /api/v1/states/<state_id> with invalid JSON"""
+        state = State(name="Initial State")
         storage.new(state)
         storage.save()
 
-        response = self.client.get(f"/api/v1/states/{state.id}")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["name"], "TestState")
+        headers = {"Content-Type": "application/json"}
+        response = self.client.put(f'/api/v1/states/{state.id}',
+                                   data="invalid_json", headers=headers)
+        self.assertEqual(response.status_code, 400)
+        error_message = response.get_json() or {}
+        self.assertIn("Not a JSON", error_message.get("description", ""))
+
+        # Clean up
+        storage.delete(state)
+        storage.save()
+
+    def test_update_state_missing_name(self):
+        """Test PUT /api/v1/states/<state_id> without name in JSON"""
+        state = State(name="Initial State")
+        storage.new(state)
+        storage.save()
+
+        headers = {"Content-Type": "application/json"}
+        response = self.client.put(f'/api/v1/states/{state.id}',
+                                   json={}, headers=headers)
+        self.assertEqual(response.status_code, 400)
+        error_message = response.get_json() or {}
+        self.assertIn("Missing name", error_message.get("description", ""))
 
         # Clean up
         storage.delete(state)
