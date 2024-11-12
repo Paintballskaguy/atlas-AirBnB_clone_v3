@@ -183,20 +183,19 @@ class TestAmenityAPI(unittest.TestCase):
     def test_create_amenity_missing_name(self):
         """Test POST /api/v1/amenities with missing 'name' field."""
         headers = {"Content-Type": "application/json"}
-        response = self.client.post(
-            '/api/v1/amenities', json={}, headers=headers
-        )
+        response = self.client.post('/api/v1/amenities', json={}, headers=headers)
         self.assertEqual(response.status_code, 400)
-        self.assertIn("Missing name", response.get_json().get("error"))
+        error_message = response.get_json() or {}
+        self.assertIn("Missing name", error_message.get("error", ""))
 
     def test_create_amenity_invalid_json(self):
-        """Test POST /api/v1/amenities with invalid JSON."""
+        """Test PUT /api/v1/amenities/<amenity_id> with invalid JSON."""
         headers = {"Content-Type": "application/json"}
-        response = self.client.post(
-            '/api/v1/amenities', data="invalid_json", headers=headers
-        )
+        amenity_id = "valid_amenity_id"
+        response = self.client.put(f'/api/v1/amenities/{amenity_id}', data="invalid_json", headers=headers)
         self.assertEqual(response.status_code, 400)
-        self.assertIn("Not a JSON", response.get_json().get("error"))
+        error_message = response.get_json() or {}
+        self.assertIn("Not a JSON", error_message.get("error", ""))
 
     def test_update_amenity(self):
         """Test PUT /api/v1/amenities/<amenity_id> to update an amenity."""
@@ -218,14 +217,12 @@ class TestAmenityAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_update_amenity_invalid_json(self):
-        """Test PUT /api/v1/amenities/<amenity_id> with invalid JSON."""
+        """Test POST /api/v1/amenities with invalid JSON."""
         headers = {"Content-Type": "application/json"}
-        response = self.client.put(
-            f'/api/v1/amenities/{self.amenity.id}',
-            data="invalid_json", headers=headers
-        )
+        response = self.client.post('/api/v1/amenities', data="invalid_json", headers=headers)
         self.assertEqual(response.status_code, 400)
-        self.assertIn("Not a JSON", response.get_json().get("error"))
+        error_message = response.get_json() or {}
+        self.assertIn("Not a JSON", error_message.get("error", ""))
 
 
 if __name__ == '__main__':
