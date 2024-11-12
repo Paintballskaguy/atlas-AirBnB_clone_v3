@@ -18,6 +18,7 @@ from flask import Flask
 
 class TestAmenityDocs(unittest.TestCase):
     """Tests to check the documentation and style of Amenity class"""
+
     @classmethod
     def setUpClass(cls):
         """Set up for the doc tests"""
@@ -62,6 +63,7 @@ class TestAmenityDocs(unittest.TestCase):
 
 class TestAmenity(unittest.TestCase):
     """Test the Amenity class"""
+
     def test_is_subclass(self):
         """Test that Amenity is a subclass of BaseModel"""
         amenity = Amenity()
@@ -80,9 +82,8 @@ class TestAmenity(unittest.TestCase):
             self.assertEqual(amenity.name, "")
 
     def test_to_dict_creates_dict(self):
-        """test to_dict method creates a dictionary with proper attrs"""
+        """Test to_dict method creates a dictionary with proper attrs"""
         am = Amenity()
-        print(am.__dict__)
         new_d = am.to_dict()
         self.assertEqual(type(new_d), dict)
         self.assertFalse("_sa_instance_state" in new_d)
@@ -92,7 +93,7 @@ class TestAmenity(unittest.TestCase):
         self.assertTrue("__class__" in new_d)
 
     def test_to_dict_values(self):
-        """test that values in dict returned from to_dict are correct"""
+        """Test that values in dict returned from to_dict are correct"""
         t_format = "%Y-%m-%dT%H:%M:%S.%f"
         am = Amenity()
         new_d = am.to_dict()
@@ -103,7 +104,7 @@ class TestAmenity(unittest.TestCase):
         self.assertEqual(new_d["updated_at"], am.updated_at.strftime(t_format))
 
     def test_str(self):
-        """test that the str method has the correct output"""
+        """Test that the str method has the correct output"""
         amenity = Amenity()
         string = "[Amenity] ({}) {}".format(amenity.id, amenity.__dict__)
         self.assertEqual(string, str(amenity))
@@ -160,8 +161,7 @@ class TestAmenityAPI(unittest.TestCase):
         self.assertEqual(response.json, {})
 
     def test_delete_amenity_not_found(self):
-        """Test DELETE /api/v1/amenities/<amenity_id>
-        with a non-existent ID."""
+        """Test DELETE /api/v1/amenities/<amenity_id> with a non-existent ID."""
         response = self.client.delete('/api/v1/amenities/invalid_id')
         self.assertEqual(response.status_code, 404)
 
@@ -185,7 +185,7 @@ class TestAmenityAPI(unittest.TestCase):
         headers = {"Content-Type": "application/json"}
         response = self.client.post(
             '/api/v1/amenities', json={}, headers=headers
-            )
+        )
         self.assertEqual(response.status_code, 400)
         error_message = response.get_json() or {}
         self.assertIn("Missing name", error_message.get("error", ""))
@@ -195,8 +195,9 @@ class TestAmenityAPI(unittest.TestCase):
         headers = {"Content-Type": "application/json"}
         amenity_id = "valid_amenity_id"
         response = self.client.put(
-            f'/api/v1/amenities/{amenity_id}', data="invalid_json", headers=headers
-            )
+            f'/api/v1/amenities/{amenity_id}', data="invalid_json",
+            headers=headers
+        )
         self.assertEqual(response.status_code, 400)
         error_message = response.get_json() or {}
         self.assertIn("Not a JSON", error_message.get("error", ""))
@@ -225,7 +226,7 @@ class TestAmenityAPI(unittest.TestCase):
         headers = {"Content-Type": "application/json"}
         response = self.client.post(
             '/api/v1/amenities', data="invalid_json", headers=headers
-            )
+        )
         self.assertEqual(response.status_code, 400)
         error_message = response.get_json() or {}
         self.assertIn("Not a JSON", error_message.get("error", ""))
