@@ -161,7 +161,7 @@ class TestAmenityAPI(unittest.TestCase):
         self.assertEqual(response.json, {})
 
     def test_delete_amenity_not_found(self):
-        """Test DELETE /api/v1/amenities/<amenity_id> with a non-existent ID."""
+        """Test DELETE /api/v1/amenities/<amenity_id> with a non-existent ID"""
         response = self.client.delete('/api/v1/amenities/invalid_id')
         self.assertEqual(response.status_code, 404)
 
@@ -223,7 +223,7 @@ class TestAmenityAPI(unittest.TestCase):
         """Test PUT /api/v1/amenities/<amenity_id> with invalid JSON."""
         headers = {"Content-Type": "application/json"}
         response = self.client.put(
-            f'/api/v1/amenities/{self.amenity.id}', data="invalid_json", headers=headers
+           f'/api/v1/amenities/{self.amenity.id}', data="invalid_json", headers=headers
         )
         self.assertEqual(response.status_code, 400)
         error_message = response.get_json(silent=True) or {}
